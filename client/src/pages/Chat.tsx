@@ -1,11 +1,34 @@
-import React, { useContext } from "react";
+import React, { useState } from "react";
 
-import { SocketContext } from "../context/Socket";
+import Form from "../components/Form";
+import Chat from "../components/Chat";
 
-const Chat: React.FC = () => {
-  const socket = useContext(SocketContext);
+const App: React.FC = () => {
+  const [username, setUsername] = useState("");
+  const [connected, setConnected] = useState(false);
 
-  return <></>;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUsername(e.target.value);
+  };
+
+  return (
+    <>
+      <div
+        className="h-screen bg-gray-200"
+        style={{ backgroundImage: "url(background.png)" }}
+      >
+        {connected ? (
+          <Chat username={username} />
+        ) : (
+          <Form
+            username={username}
+            onChange={handleChange}
+            connect={() => setConnected(true)}
+          />
+        )}
+      </div>
+    </>
+  );
 };
 
-export default Chat;
+export default App;
