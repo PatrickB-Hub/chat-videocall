@@ -118,7 +118,7 @@ io.on("connection", function (socket) {
         io.emit("CONNECTED_USERS", users);
     });
 });
-// server static files in production
+// serve static files in production
 if (process.env.PROD) {
     app.use(express.static(path.join(__dirname, "./client/build")));
     app.get("*", function (_, res) {
