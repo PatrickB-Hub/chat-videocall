@@ -18,12 +18,13 @@ const initialCurrentChatState = {
   receiverID: "",
 };
 
-const initialMessagesState = {
+const initialMessagesState: { [key: string]: messageType[] } = {
   general: [],
   javascript: [],
   random: [],
   jokes: [],
 };
+
 interface ChatProps {
   username: string;
 }

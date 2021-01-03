@@ -13,6 +13,8 @@ var messages = {
     random: [],
     jokes: []
 };
+var videoCallUsers = {};
+var socketToRoom = {};
 // listener for new connections
 io.on("connection", function (socket) {
     // create new user and send (to everyone) the users list
@@ -51,7 +53,65 @@ io.on("connection", function (socket) {
         users = users.filter(function (user) { return user.id !== socket.id; });
         io.emit("CONNECTED_USERS", users);
     });
+    // -------------------------------------------------------
+    //                     Video Call
+    // -------------------------------------------------------
+    // allow user to join a room and send the ids of the other users in that room
+    socket.on("JOIN_ROOM", function (_a) {
+        var roomID = _a.roomID, username = _a.username;
+        // join exiting room or create a new one
+        if (videoCallUsers[roomID]) {
+            var length_1 = videoCallUsers[roomID].length;
+            if (length_1 >= 4) {
+                socket.emit("ROOM_FULL");
+                return;
+            }
+            videoCallUsers[roomID].push(socket.id);
+        }
+        else {
+            videoCallUsers[roomID] = [socket.id];
+        }
+        socketToRoom[socket.id] = roomID;
+        var usersInThisRoom = videoCallUsers[roomID].filter(function (id) { return id !== socket.id; });
+        socket.emit("USERS_IN_ROOM", usersInThisRoom);
+        // keep user connected in chat so we can send videocall invitations
+        if (username) {
+            var user = {
+                username: username,
+                id: socket.id
+            };
+            users.push(user);
+            io.emit("CONNECTED_USERS", users);
+        }
+    });
+    // notify the other users when a new user joined a room
+    socket.on("SEND_SIGNAL", function (payload) {
+        io.to(payload.userToSignal).emit("USER_JOINED_ROOM", { signal: payload.signal, callerID: payload.callerID });
+    });
+    socket.on("RETURN_SIGNAL", function (payload) {
+        io.to(payload.callerID).emit("RECEIVED_RETURN_SIGNAL", { signal: payload.signal, id: socket.id });
+    });
+    // remove user from room and send the id to the remaining users
+    socket.on("LEAVE_ROOM", function () {
+        var roomID = socketToRoom[socket.id];
+        var room = videoCallUsers[roomID];
+        if (room) {
+            room = room.filter(function (id) { return id !== socket.id; });
+            videoCallUsers[roomID] = room;
+        }
+        socket.broadcast.emit("USER_LEFT_ROOM", socket.id);
+        users = users.filter(function (user) { return user.id !== socket.id; });
+        io.emit("CONNECTED_USERS", users);
+    });
     socket.on("disconnect", function () {
+        // remove user from room and send the id to the remaining users
+        var roomID = socketToRoom[socket.id];
+        var room = videoCallUsers[roomID];
+        if (room) {
+            room = room.filter(function (id) { return id !== socket.id; });
+            videoCallUsers[roomID] = room;
+        }
+        socket.broadcast.emit("USER_LEFT_ROOM", socket.id);
         users = users.filter(function (user) { return user.id !== socket.id; });
         io.emit("CONNECTED_USERS", users);
     });

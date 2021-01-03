@@ -5,7 +5,15 @@ const server = http.createServer(app);
 import socket = require("socket.io");
 const io = socket(server, {});
 
-import { allUsersType, messageType, sendMessageType } from "./types";
+import {
+  allUsersType,
+  messageType,
+  sendMessageType,
+  joinRoomType,
+  sendSignalPayloadType,
+  returnedSignalPayloadType
+} from "./types";
+
 
 let users: allUsersType = [];
 const messages: { [key: string]: messageType[] } = {
@@ -14,6 +22,9 @@ const messages: { [key: string]: messageType[] } = {
   random: [],
   jokes: []
 };
+
+const videoCallUsers: { [key: string]: string[] } = {};
+const socketToRoom: { [key: string]: string } = {};
 
 // listener for new connections
 io.on("connection", (socket) => {
@@ -59,7 +70,78 @@ io.on("connection", (socket) => {
     io.emit("CONNECTED_USERS", users);
   });
 
+
+  // -------------------------------------------------------
+  //                     Video Call
+  // -------------------------------------------------------
+
+  // allow user to join a room and send the ids of the other users in that room
+  socket.on("JOIN_ROOM", ({ roomID, username }: joinRoomType) => {
+    // join exiting room or create a new one
+    if (videoCallUsers[roomID]) {
+      const length = videoCallUsers[roomID].length;
+      if (length >= 4) {
+        socket.emit("ROOM_FULL");
+        return;
+      }
+      videoCallUsers[roomID].push(socket.id);
+    } else {
+      videoCallUsers[roomID] = [socket.id];
+    }
+    socketToRoom[socket.id] = roomID;
+    const usersInThisRoom = videoCallUsers[roomID].filter(id => id !== socket.id);
+    socket.emit("USERS_IN_ROOM", usersInThisRoom);
+
+    // keep user connected in chat so we can send videocall invitations
+    if (username) {
+      const user = {
+        username,
+        id: socket.id
+      }
+      users.push(user);
+      io.emit("CONNECTED_USERS", users);
+    }
+  });
+
+  // notify the other users when a new user joined a room
+  socket.on("SEND_SIGNAL", (payload: sendSignalPayloadType) => {
+    io.to(payload.userToSignal).emit(
+      "USER_JOINED_ROOM",
+      { signal: payload.signal, callerID: payload.callerID }
+    );
+  });
+
+  socket.on("RETURN_SIGNAL", (payload: returnedSignalPayloadType) => {
+    io.to(payload.callerID).emit(
+      "RECEIVED_RETURN_SIGNAL",
+      { signal: payload.signal, id: socket.id }
+    );
+  });
+
+  // remove user from room and send the id to the remaining users
+  socket.on("LEAVE_ROOM", () => {
+    const roomID = socketToRoom[socket.id];
+    let room = videoCallUsers[roomID];
+    if (room) {
+      room = room.filter((id) => id !== socket.id);
+      videoCallUsers[roomID] = room;
+    }
+    socket.broadcast.emit("USER_LEFT_ROOM", socket.id);
+
+    users = users.filter((user) => user.id !== socket.id);
+    io.emit("CONNECTED_USERS", users);
+  });
+
   socket.on("disconnect", () => {
+    // remove user from room and send the id to the remaining users
+    const roomID = socketToRoom[socket.id];
+    let room = videoCallUsers[roomID];
+    if (room) {
+      room = room.filter((id) => id !== socket.id);
+      videoCallUsers[roomID] = room;
+    }
+    socket.broadcast.emit("USER_LEFT_ROOM", socket.id);
+
     users = users.filter((user) => user.id !== socket.id);
     io.emit("CONNECTED_USERS", users);
   });

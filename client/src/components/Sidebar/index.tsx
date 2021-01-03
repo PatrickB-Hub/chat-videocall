@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import CreateRoom from "../Video/CreateRoom";
 import {
   userType,
   allUsersType,
@@ -166,6 +167,11 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
               {props.allUsers.map(renderUser)}
             </ul>
             <hr className="my-4 md:min-w-full" />
+            {/* Video Call */}
+            <h6 className="md:min-w-full text-gray-600 text-sm uppercase font-bold block pt-1 pb-4 no-underline">
+              Video Call
+            </h6>
+            <CreateRoom username={props.username} allUsers={props.allUsers} yourID={props.yourID} />
           </div>
         </div>
       </nav>

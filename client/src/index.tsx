@@ -7,6 +7,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 
 import { SocketContext, socket } from "./context/Socket";
 import Chat from "./pages/Chat";
+import Videocall from "./pages/Videocall";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -14,6 +15,7 @@ ReactDOM.render(
       <BrowserRouter>
         <Switch>
           <Route path="/chat" component={Chat} />
+          <Route path="/room" component={Videocall} />
           <Redirect exact from="/" to="/chat" />
         </Switch>
       </BrowserRouter>
