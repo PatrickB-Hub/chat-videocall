@@ -1,4 +1,7 @@
+import path = require("path");
 import http = require("http");
+require("dotenv").config();
+
 import express = require("express");
 const app = express();
 const server = http.createServer(app);
@@ -147,5 +150,13 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = 5550;
+// serve static files in production
+if (process.env.PROD) {
+  app.use(express.static(path.join(__dirname, "./client/build")));
+  app.get("*", (_, res) => {
+    res.sendFile(path.join(__dirname, "./client/build/index.html"));
+  });
+}
+
+const PORT = process.env.PORT || 5550;
 server.listen(PORT, () => console.log(`Server is running on port ${PORT}.`))

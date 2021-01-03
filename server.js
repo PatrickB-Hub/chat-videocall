@@ -1,6 +1,8 @@
 "use strict";
 exports.__esModule = true;
+var path = require("path");
 var http = require("http");
+require("dotenv").config();
 var express = require("express");
 var app = express();
 var server = http.createServer(app);
@@ -116,5 +118,12 @@ io.on("connection", function (socket) {
         io.emit("CONNECTED_USERS", users);
     });
 });
-var PORT = 5550;
+// server static files in production
+if (process.env.PROD) {
+    app.use(express.static(path.join(__dirname, "./client/build")));
+    app.get("*", function (_, res) {
+        res.sendFile(path.join(__dirname, "./client/build/index.html"));
+    });
+}
+var PORT = process.env.PORT || 5550;
 server.listen(PORT, function () { return console.log("Server is running on port " + PORT + "."); });
