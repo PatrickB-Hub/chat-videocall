@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 
-import CreateRoom from "../Video/CreateRoom";
+import User from "../Chat/user";
+import CreateRoomBtn from "../Video/createRoom";
 import {
-  userType,
   allUsersType,
   currentChatType,
   unreadMessagesType,
@@ -35,7 +35,7 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
     setCollapseShow("hidden");
   };
 
-  const renderChannels = (channel: string) => {
+  const renderChannel = (channel: string) => {
     const currentChat = {
       chatName: channel,
       isChannel: true,
@@ -73,46 +73,6 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
     );
   };
 
-  const renderUser = (user: userType) => {
-    if (user.id !== props.yourID) {
-      const currentChat = {
-        chatName: user.username,
-        isChannel: false,
-        receiverID: user.id,
-      };
-
-      return (
-        <li
-          className="md:mx-0 mx-auto inline-flex"
-          key={user.id}
-          onClick={() => handleClick(currentChat, false)}
-        >
-          <button
-            className={
-              "text-gray-800 hover:text-gray-600 text-sm block px-2 py-2 no-underline font-semibold border-transparent" +
-              (user.username === selectedChat
-                ? " text-pink-500 hover:text-pink-600"
-                : "")
-            }
-          >
-            <span className="flex items-center space-x-1">
-              <i className="fas fa-comments mr-1 text-gray-500 text-base"></i>
-              <span>{user.username}</span>
-              {props.unreadMessages.hasOwnProperty(user.username) &&
-                props.unreadMessages[user.username] > 0 && (
-                  <span className="bg-pink-500 text-white text-xs h-5 w-5 rounded-full flex items-center justify-center">
-                    {props.unreadMessages[user.username] > 9
-                      ? "9+"
-                      : props.unreadMessages[user.username]}
-                  </span>
-                )}
-            </span>
-          </button>
-        </li>
-      );
-    }
-  };
-
   return (
     <>
       <nav className="md:left-0 md:block md:fixed md:top-0 md:bottom-0 md:overflow-y-auto md:flex-row md:flex-no-wrap md:overflow-hidden shadow-xl bg-white flex flex-wrap items-center justify-between relative md:w-1/4 lg:w-1/5 z-10 md:py-4 md:px-6 px-2">
@@ -125,7 +85,7 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
           >
             <i className="fas fa-bars"></i>
           </button>
-          {/* Selected Channel */}
+          {/* Chat/Room */}
           <div className="md:hidden sm:inline-block md:pb-2 text-gray-700 mr-4 whitespace-no-wrap text-sm uppercase font-bold p-4 px-0">
             {selectedChat}
           </div>
@@ -154,7 +114,7 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
             </h6>
             {/* Channels */}
             <ul className="md:flex-col md:min-w-full flex flex-col list-none">
-              {channels.map(renderChannels)}
+              {channels.map(renderChannel)}
             </ul>
             {/* Divider */}
             <hr className="my-4 md:min-w-full" />
@@ -164,14 +124,27 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
             </h6>
             {/* Users */}
             <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
-              {props.allUsers.map(renderUser)}
+              {props.allUsers
+                .filter((u) => u.id !== props.yourID)
+                .map((user) => (
+                  <User
+                    user={user}
+                    selectedChat={selectedChat}
+                    unreadMessages={props.unreadMessages}
+                    handleClick={handleClick}
+                  />
+                ))}
             </ul>
             <hr className="my-4 md:min-w-full" />
             {/* Video Call */}
             <h6 className="md:min-w-full text-gray-600 text-sm uppercase font-bold block pt-1 pb-4 no-underline">
               Video Call
             </h6>
-            <CreateRoom username={props.username} allUsers={props.allUsers} yourID={props.yourID} />
+            <CreateRoomBtn
+              username={props.username}
+              allUsers={props.allUsers}
+              yourID={props.yourID}
+            />
           </div>
         </div>
       </nav>

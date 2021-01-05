@@ -287,10 +287,11 @@ const Room: React.FC<RoomProps> = (props) => {
                 </button>
               </div>
             </div>
-            {/* Users */}
+            {/* Heading */}
             <h6 className="md:min-w-full text-gray-600 text-sm uppercase font-bold block pt-1 pb-4 no-underline">
               Invite Users
             </h6>
+            {/* Users */}
             <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
               {allUsers.filter((u) => u.id !== state?.yourID).map(renderUser)}
             </ul>
