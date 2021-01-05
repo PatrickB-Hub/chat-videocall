@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+import Channel from "../Chat/channel";
 import User from "../Chat/user";
 import CreateRoomBtn from "../Video/createRoom";
 import {
@@ -33,44 +34,6 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
     props.toggleChat(currentChat);
     setSelectedChat(currentChat.chatName);
     setCollapseShow("hidden");
-  };
-
-  const renderChannel = (channel: string) => {
-    const currentChat = {
-      chatName: channel,
-      isChannel: true,
-      receiverID: "",
-    };
-
-    return (
-      <li
-        className="md:mx-0 mx-auto items-center"
-        key={channel}
-        onClick={() => handleClick(currentChat, true)}
-      >
-        <button
-          className={
-            "text-gray-800 hover:text-gray-600 text-xs uppercase px-3 py-3 font-bold block border-none" +
-            (channel === selectedChat
-              ? " text-pink-500 hover:text-pink-600"
-              : "")
-          }
-        >
-          <span className="flex items-center space-x-1">
-            <i className="fas fa-sign-in-alt text-gray-500 mr-1 text-sm"></i>
-            <span>{channel}</span>
-            {props.unreadMessages.hasOwnProperty(channel) &&
-              props.unreadMessages[channel] > 0 && (
-                <span className="bg-pink-500 text-white text-xs h-5 w-5 rounded-full flex items-center justify-center">
-                  {props.unreadMessages[channel] > 9
-                    ? "9+"
-                    : props.unreadMessages[channel]}
-                </span>
-              )}
-          </span>
-        </button>
-      </li>
-    );
   };
 
   return (
@@ -114,7 +77,14 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
             </h6>
             {/* Channels */}
             <ul className="md:flex-col md:min-w-full flex flex-col list-none">
-              {channels.map(renderChannel)}
+              {channels.map((channel) => (
+                <Channel
+                  channel={channel}
+                  selectedChat={selectedChat}
+                  unreadMessages={props.unreadMessages}
+                  handleClick={handleClick}
+                />
+              ))}
             </ul>
             {/* Divider */}
             <hr className="my-4 md:min-w-full" />
