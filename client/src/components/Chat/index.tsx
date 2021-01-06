@@ -11,12 +11,17 @@ import {
   messageType,
   messagesType,
 } from "../../../../types";
+import Channel from "./channel";
+import User from "./user";
+import CreateRoom from "../Video/createRoom";
 
 const initialCurrentChatState = {
   isChannel: true,
   chatName: "general",
   receiverID: "",
 };
+
+const channels = ["general", "javascript", "random", "jokes"];
 
 const initialMessagesState: { [key: string]: messageType[] } = {
   general: [],
@@ -40,6 +45,14 @@ const Chat: React.FC<ChatProps> = ({ username }) => {
   const [messages, setMessages] = useState<messagesType>(initialMessagesState);
   const [message, setMessage] = useState("");
   const selectedChat = useRef("general");
+
+  const handleClick = (currentChat: currentChatType, isChannel: boolean) => {
+    selectedChat.current = currentChat.chatName;
+    if (isChannel && !connectedChats.includes(currentChat.chatName)) {
+      joinChat(currentChat.chatName);
+    }
+    toggleChat(currentChat);
+  };
 
   const sendMessage = () => {
     if (message) {
@@ -154,18 +167,57 @@ const Chat: React.FC<ChatProps> = ({ username }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  type HeadingProps = {
+    text: string;
+  };
+
+  const Heading = ({ text }: HeadingProps) => (
+    <h6 className="md:min-w-full text-gray-600 text-sm uppercase font-bold block pt-1 pb-4 no-underline">
+      {text}
+    </h6>
+  );
+
+  const Divider = () => <hr className="my-4 md:min-w-full" />;
+
   return (
     <>
-      <SideBar
-        username={username}
-        yourID={socket ? socket.id : ""}
-        allUsers={allUsers}
-        joinChat={joinChat}
-        selectedChat={selectedChat}
-        toggleChat={toggleChat}
-        connectedChats={connectedChats}
-        unreadMessages={unreadMessages}
-      />
+      <SideBar selectedChat={selectedChat.current}>
+        {/* Channels */}
+        <Heading text={"Channels"} />
+        <ul className="md:flex-col md:min-w-full flex flex-col list-none">
+          {channels.map((channel) => (
+            <Channel
+              channel={channel}
+              selectedChat={selectedChat.current}
+              unreadMessages={unreadMessages}
+              handleClick={handleClick}
+            />
+          ))}
+        </ul>
+        <Divider />
+        {/* Users */}
+        <Heading text={"Users"} />
+        <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
+          {allUsers
+            .filter((u) => u.id !== socket.id)
+            .map((user) => (
+              <User
+                user={user}
+                selectedChat={selectedChat.current}
+                unreadMessages={unreadMessages}
+                handleClick={handleClick}
+              />
+            ))}
+        </ul>
+        <Divider />
+        {/* Video Call */}
+        <Heading text={"Video Call"} />
+        <CreateRoom
+          username={username}
+          allUsers={allUsers}
+          yourID={socket.id}
+        />
+      </SideBar>
       <div
         className="right-0 md:block fixed md:top-0 top-12 bottom-0 w-full md:w-3/4 lg:w-4/5 bg-gray-200"
         style={{ backgroundImage: "url(background.png)" }}

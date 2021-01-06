@@ -1,40 +1,11 @@
 import React, { useState } from "react";
 
-import Channel from "../Chat/channel";
-import User from "../Chat/user";
-import CreateRoomBtn from "../Video/createRoom";
-import {
-  allUsersType,
-  currentChatType,
-  unreadMessagesType,
-} from "../../../../types";
-
-const channels = ["general", "javascript", "random", "jokes"];
-
 interface SideBarProps {
-  joinChat: (chat: string) => void;
-  toggleChat: (currentChat: currentChatType) => void;
-  username: string;
-  yourID: string;
-  allUsers: allUsersType;
-  selectedChat: React.MutableRefObject<string>;
-  connectedChats: string[];
-  unreadMessages: unreadMessagesType;
+  selectedChat: string;
 }
 
-const Sidebar: React.FC<SideBarProps> = (props) => {
+const Sidebar: React.FC<SideBarProps> = ({ selectedChat, children }) => {
   const [collapseShow, setCollapseShow] = useState("hidden");
-  const [selectedChat, setSelectedChat] = useState("general");
-
-  const handleClick = (currentChat: currentChatType, isChannel: boolean) => {
-    props.selectedChat.current = currentChat.chatName;
-    if (isChannel && !props.connectedChats.includes(currentChat.chatName)) {
-      props.joinChat(currentChat.chatName);
-    }
-    props.toggleChat(currentChat);
-    setSelectedChat(currentChat.chatName);
-    setCollapseShow("hidden");
-  };
 
   return (
     <>
@@ -71,50 +42,7 @@ const Sidebar: React.FC<SideBarProps> = (props) => {
                 </button>
               </div>
             </div>
-            {/* Heading */}
-            <h6 className="md:min-w-full text-gray-600 text-sm uppercase font-bold block pt-1 pb-4 no-underline">
-              Channels
-            </h6>
-            {/* Channels */}
-            <ul className="md:flex-col md:min-w-full flex flex-col list-none">
-              {channels.map((channel) => (
-                <Channel
-                  channel={channel}
-                  selectedChat={selectedChat}
-                  unreadMessages={props.unreadMessages}
-                  handleClick={handleClick}
-                />
-              ))}
-            </ul>
-            {/* Divider */}
-            <hr className="my-4 md:min-w-full" />
-            {/* Heading */}
-            <h6 className="md:min-w-full text-gray-600 text-sm uppercase font-bold block pt-1 pb-4 no-underline">
-              Users
-            </h6>
-            {/* Users */}
-            <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
-              {props.allUsers
-                .filter((u) => u.id !== props.yourID)
-                .map((user) => (
-                  <User
-                    user={user}
-                    selectedChat={selectedChat}
-                    unreadMessages={props.unreadMessages}
-                    handleClick={handleClick}
-                  />
-                ))}
-            </ul>
-            <hr className="my-4 md:min-w-full" />
-            {/* Video Call */}
-            <h6 className="md:min-w-full text-gray-600 text-sm uppercase font-bold block pt-1 pb-4 no-underline">
-              Video Call
-            </h6>
-            <CreateRoomBtn
-              username={props.username}
-              allUsers={props.allUsers}
-              yourID={props.yourID}
-            />
+            {children}
           </div>
         </div>
       </nav>

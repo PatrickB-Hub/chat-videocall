@@ -10,7 +10,7 @@ interface ChannelProps {
   handleClick: (currentChat: currentChatType, isChannel: boolean) => void;
 }
 
-const User: React.FC<ChannelProps> = ({
+const Channel: React.FC<ChannelProps> = ({
   channel,
   selectedChat,
   unreadMessages,
@@ -49,4 +49,4 @@ const User: React.FC<ChannelProps> = ({
   );
 };
 
-export default User;
+export default Channel;
