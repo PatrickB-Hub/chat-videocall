@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import Peer from "simple-peer";
 
-import Video from "../components/Video"
+import Video from "../components/Video";
 import { SocketContext } from "../context/Socket";
 import {
   userType,
@@ -24,6 +24,7 @@ const Room: React.FC<RoomProps> = (props) => {
   const socket = useContext(SocketContext);
   const history = useHistory();
   const [collapseShow, setCollapseShow] = useState("hidden");
+  const [showCopiedMesssage, setShowCopiedMesssage] = useState(false);
   const [peers, setPeers] = useState<peersType[]>([]);
   const [allUsers, setAllUsers] = useState<allUsersType>(
     props?.location?.state?.allUsers || []
@@ -77,8 +78,6 @@ const Room: React.FC<RoomProps> = (props) => {
   };
 
   const renderUser = (user: userType) => {
-    console.log("user id", user.id, "your id", state?.yourID);
-
     const payload = {
       content: roomID,
       sender: state && state.username,
@@ -113,49 +112,52 @@ const Room: React.FC<RoomProps> = (props) => {
   };
 
   const copyToClipboard = () => {
-    //the text that is to be copied to the clipboard
+    // show the "successful copy" tooltip for a second
+    setShowCopiedMesssage(true);
+    setTimeout(() => setShowCopiedMesssage(false), 1000);
+    // the text that is to be copied to the clipboard
     const URL = document.location.href;
 
-    //create our hidden div element
+    // create hidden div element
     const hiddenCopy = document.createElement("div");
-    //set the innerHTML of the div
     hiddenCopy.innerHTML = URL;
-    //set the position to be absolute and off the screen
+    // initial position off the screen
     hiddenCopy.style.position = "absolute";
     hiddenCopy.style.left = "-9999px";
 
-    //check and see if the user had a text selection range
+    // check and see if the user had a text selection range
     let currentRange;
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
-      //the user has a text selection range, store it
+      // the user has a text selection range, store it
       currentRange = selection.getRangeAt(0);
-      //remove the current selection
+      // remove the current selection
       selection.removeRange(currentRange);
     }
 
-    //append the div to the body
+    // append the div to the body
     document.body.appendChild(hiddenCopy);
-    //create a selection range
+    // create a selection range
     var CopyRange = document.createRange();
-    //set the copy range to be the hidden div
+    // set the copy range to be the hidden div
     CopyRange.selectNode(hiddenCopy);
-    //add the copy range
+    // add the copy range
     selection?.addRange(CopyRange);
 
-    //since not all browsers support this, use a try block
     try {
       //copy the text
       document.execCommand("copy");
     } catch (err) {
-      window.alert("Your Browser Doesn't support this! Error : " + err);
+      console.log(
+        "Your browser does not support 'execCommand(\"copy\")'! Error : " + err
+      );
     }
-    //remove the selection range (Chrome throws a warning if we don't.)
+    // remove the selection range (Chrome throws a warning if we don't.)
     selection?.removeRange(CopyRange);
-    //remove the hidden div
+    // remove the hidden div
     document.body.removeChild(hiddenCopy);
 
-    //return the old selection range
+    // return the old selection range
     if (currentRange) {
       selection?.addRange(currentRange);
     }
@@ -174,7 +176,7 @@ const Room: React.FC<RoomProps> = (props) => {
     };
 
     let userMedia: MediaStream;
-    // render video tags for every stream
+    // render video for every stream
     navigator.mediaDevices
       .getUserMedia({ video: videoConstraints, audio: true })
       .then((stream) => {
@@ -318,7 +320,6 @@ const Room: React.FC<RoomProps> = (props) => {
         <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-4 gap-2 md:gap-3 h-full min-h-screen md:min-h-0">
           {/* Peers Videos */}
           {peers.map((peer, i) => {
-            console.log(i, peer);
             return (
               <div
                 key={peer.peerID}
@@ -341,8 +342,10 @@ const Room: React.FC<RoomProps> = (props) => {
                   onClick={copyToClipboard}
                   className="has-tooltip bg-gray-100 rounded px-1 cursor-pointer"
                 >
-                  <span className="tooltip rounded text-sm shadow-md p-1 bg-gray-100 text-gray-600 -mt-10 transform -translate-x-9">
-                    Copy to clipboard
+                  <span className="tooltip rounded text-sm shadow-md p-1 bg-gray-100 text-gray-600 -mt-10 transform -translate-x-12">
+                    {showCopiedMesssage
+                      ? "Copied to clipboard!"
+                      : "Click to copy the URL"}
                   </span>
                   URL
                 </span>{" "}
