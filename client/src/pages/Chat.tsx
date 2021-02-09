@@ -3,9 +3,13 @@ import React, { useState } from "react";
 import Form from "../components/Form";
 import Chat from "../components/Chat";
 
-const App: React.FC = () => {
-  const [username, setUsername] = useState("");
-  const [connected, setConnected] = useState(false);
+interface ChatProps {
+  location: any;
+}
+
+const App: React.FC<ChatProps> = ({ location }) => {
+  const [username, setUsername] = useState(location?.state?.username || "");
+  const [connected, setConnected] = useState(location?.state?.username && true);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
