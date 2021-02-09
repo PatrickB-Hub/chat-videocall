@@ -7,22 +7,22 @@ import { allUsersType } from "../../../../types";
 interface CreateRoomProps {
   username: string;
   allUsers: allUsersType;
-  yourID: string;
+  userID: string;
 }
 
 const CreateRoom: React.FC<CreateRoomProps> = ({
   username,
   allUsers,
-  yourID,
+  userID,
 }) => {
   const history = useHistory();
 
   const create = () => {
     const id = uuid();
     history.push(`/room/${id}`, {
-      username: username,
       users: allUsers,
-      yourID: yourID,
+      username,
+      userID,
     });
   };
 

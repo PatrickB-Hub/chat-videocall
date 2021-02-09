@@ -4,16 +4,16 @@ import { messageType } from "../../../../types";
 
 interface MessageProps {
   username: string;
-  yourID: string;
+  userID: string;
   message: messageType;
 }
 
-const Message: React.FC<MessageProps> = ({ username, yourID, message }) => {
+const Message: React.FC<MessageProps> = ({ username, userID, message }) => {
   const history = useHistory();
   const isUserMessage = username === message.sender;
 
   const handleClick = (id: string) => {
-    history.push(`/room/${id}`, { username, yourID });
+    history.push(`/room/${id}`, { username, userID });
   };
 
   interface renderJoinVideoCallMessageProps {

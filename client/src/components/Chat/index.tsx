@@ -215,22 +215,17 @@ const Chat: React.FC<ChatProps> = ({ username }) => {
         <CreateRoom
           username={username}
           allUsers={allUsers}
-          yourID={socket.id}
+          userID={socket.id}
         />
       </SideBar>
-      <div
-        className="right-0 md:block fixed md:top-0 top-12 bottom-0 w-full md:w-3/4 lg:w-4/5 bg-gray-200"
-        style={{ backgroundImage: "url(background.png)" }}
-      >
-        <ChatWindow
-          username={username}
-          yourID={socket ? socket.id : ""}
-          message={message}
-          handleMessageChange={handleMessageChange}
-          sendMessage={sendMessage}
-          messages={messages[currentChat.chatName]}
-        />
-      </div>
+      <ChatWindow
+        username={username}
+        userID={socket ? socket.id : ""}
+        message={message}
+        handleMessageChange={handleMessageChange}
+        sendMessage={sendMessage}
+        messages={messages[currentChat.chatName]}
+      />
     </>
   );
 };
