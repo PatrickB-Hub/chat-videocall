@@ -3,11 +3,11 @@ import React, { useState } from "react";
 import Form from "../components/Form";
 import Chat from "../components/Chat";
 
-interface ChatProps {
+interface ChatRoomProps {
   location: any;
 }
 
-const App: React.FC<ChatProps> = ({ location }) => {
+const ChatRoom: React.FC<ChatRoomProps> = ({ location }) => {
   const [username, setUsername] = useState(location?.state?.username || "");
   const [connected, setConnected] = useState(location?.state?.username && true);
 
@@ -35,4 +35,4 @@ const App: React.FC<ChatProps> = ({ location }) => {
   );
 };
 
-export default App;
+export default ChatRoom;

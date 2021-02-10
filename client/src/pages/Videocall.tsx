@@ -2,12 +2,12 @@ import React from "react";
 
 import Videocall from "../components/Video";
 
-interface RoomProps {
+interface VideocallRoomProps {
   location: any;
   match: any;
 }
 
-const Room: React.FC<RoomProps> = ({ location, match }) => {
+const VideocallRoom: React.FC<VideocallRoomProps> = ({ location, match }) => {
   return (
     <Videocall
       allUsers={location.state.users || []}
@@ -18,4 +18,4 @@ const Room: React.FC<RoomProps> = ({ location, match }) => {
   );
 };
 
-export default Room;
+export default VideocallRoom;
