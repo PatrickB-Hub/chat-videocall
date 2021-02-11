@@ -10,10 +10,10 @@ interface VideocallRoomProps {
 const VideocallRoom: React.FC<VideocallRoomProps> = ({ location, match }) => {
   return (
     <Videocall
-      allUsers={location.state.users || []}
-      username={location.state.username}
-      roomID={match.params.roomID}
-      userID={location.state.userID}
+      allUsers={location?.state?.users || []}
+      username={location?.state?.username}
+      roomID={match?.params?.roomID}
+      userID={location?.state?.userID}
     />
   );
 };
