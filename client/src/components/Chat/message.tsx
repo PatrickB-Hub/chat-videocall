@@ -20,21 +20,20 @@ const Message: React.FC<MessageProps> = ({ username, userID, message }) => {
     content: string;
   }
 
-  const renderJoinVideoCallMessage: React.FC<renderJoinVideoCallMessageProps> = ({
-    content,
-  }) => {
-    return (
-      <>
-        <p>invited you to a Video Call</p>
-        <button
-          className="bg-purple-400 hover:bg-purple-500 text-white font-semibold rounded mt-2 px-3 py-2 shadow-lg"
-          onClick={() => handleClick(content)}
-        >
-          Join now
-        </button>
-      </>
-    );
-  };
+  const renderJoinVideoCallMessage: React.FC<renderJoinVideoCallMessageProps> =
+    ({ content }) => {
+      return (
+        <>
+          <p>invited you to a Video Call</p>
+          <button
+            className="bg-purple-400 hover:bg-purple-500 text-white font-semibold rounded mt-2 px-3 py-2 shadow-lg"
+            onClick={() => handleClick(content)}
+          >
+            Join now
+          </button>
+        </>
+      );
+    };
 
   let body;
   if (message.type === "invitation") {

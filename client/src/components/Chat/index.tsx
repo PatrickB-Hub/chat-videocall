@@ -185,8 +185,9 @@ const Chat: React.FC<ChatProps> = ({ username }) => {
         {/* Channels */}
         <Heading text={"Channels"} />
         <ul className="md:flex-col md:min-w-full flex flex-col list-none">
-          {channels.map((channel) => (
+          {channels.map((channel, i) => (
             <Channel
+              key={`channel-${i}`}
               channel={channel}
               selectedChat={selectedChat.current}
               unreadMessages={unreadMessages}
@@ -202,6 +203,7 @@ const Chat: React.FC<ChatProps> = ({ username }) => {
             .filter((u) => u.id !== socket.id)
             .map((user) => (
               <User
+                key={user.id}
                 user={user}
                 selectedChat={selectedChat.current}
                 unreadMessages={unreadMessages}
