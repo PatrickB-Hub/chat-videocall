@@ -2,6 +2,8 @@
 
 Chat with your friends, join public channels or communicate in private chats. Create and manage Videocalls with up to four participants.
 
+![Chat page](http://patrickbecker.me/static/media/chat-videocall.5f53a8ee.png)
+
 ## Features
 
 - Channel Chats (one to many communication)
